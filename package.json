@@ -1,0 +1,13 @@
+{
+  "name": "document-copilot",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Multimodal serverless GenAI PDF copilot — agent + tools + guardrailed + MCP-pluggable",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "backend:deploy": "pnpm --filter backend deploy",
+    "backend:logs:query": "pnpm --filter backend logs:query",
+    "backend:invoke:query": "pnpm --filter backend invoke:query",
+    "frontend:dev": "pnpm --filter frontend dev"
+  }
+}

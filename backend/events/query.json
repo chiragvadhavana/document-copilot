@@ -1,0 +1,12 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /chat",
+  "rawPath": "/chat",
+  "rawQueryString": "",
+  "headers": { "content-type": "application/json" },
+  "requestContext": {
+    "http": { "method": "POST", "path": "/chat", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "local" }
+  },
+  "body": "{\"message\":\"hello from local invoke\"}",
+  "isBase64Encoded": false
+}

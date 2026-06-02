@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build output
+dist/
+build/
+.next/
+.serverless/
+*.zip
+*.tar.gz
+
+# Ingestion artifacts (built FAISS index + extracted images; rebuilt by ingest.py)
+ingest/out/
+
+# Container handler bundle (rebuilt by `pnpm bundle:container`)
+backend/build/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Claude local-only settings (project-level settings.json IS committed)
+.claude/settings.local.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# AWS / Serverless local state
+.serverless/
+.aws-sam/
+
+# OS
+Thumbs.db

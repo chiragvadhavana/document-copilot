@@ -1,0 +1,10 @@
+node_modules
+.serverless
+.build
+src
+scripts/serve.ts
+scripts/try-agent.ts
+events
+*.md
+.env
+.env.example

@@ -1,0 +1,52 @@
+embedding: 
+- images: image bytes + bounding box with bge-base. (caption, vague/generic caption, no caption, text nearby etc)
+- image quality pre-filter: aspect ratio, one color, etc. using cheap gemini flash model. classify each image, drop junk categories. write "display caption" for that image. 
+- display caption: generating using gemini flash model. it's display only, not used for search.
+- dual embed: image stored as two vectors, not one. caption + page vector. 
+future: embed the display caption + raw caption + page vector. vector + image both in one page.
+- vector images: (due to not getting images from get_images) if lines/curves/paths are more than 40 and text is less than render page as a image using pixmap. text is always chunks regardless. sepp 21 images.
+- pdf -> page text chunk -> images -> page render fallback -> image quality filter -> embed with bge base. 
+- ingest: embed all chunks -> build faiss indexflatip index. save 3 files in s3. index.faiss, vectors.f32, metadata.json. 
+- query: download vectors.f32 + metadata.json from S3 -> load into memory -> brute force JS loop -> return top-k.
+- opensearch ingest: embed all chunks -> put vectors to opensearch index (OS stored them as build hnsw index automatically)
+- opensearch query: embed query -> send search req to OS API. -> runs hnsw index -> returns top-k. 
+- filtering metadata: there we can filter based on various params like native operations in DB. like type, company etc to reduce the number of entries.
+
+understanding pdfs, and building generic solutions. can use model to understand pdf structure as well. 
+
+----------
+some ideas:
+- image input in copilot. (+maybe feed retrived image to llm for relevency check)
+- query rewrite: user enters query -> rewrite query using llm for better search.
+- multi query: 2-3 variation of rewrite. retrieve each group -> merge results and deduplicate -> get top results -> send to llm.
+- mcp tool like youtube search, can be added to langchain tool and it can simply use it. 
+- hybrid search: keyword search and abbreviation search. 207 alarm code example.
+- rerank: get 15-20 top results -> rerank with query + answer with bge-rerank-> return top 5. (acutal answer might not be in top 5. rerank time wouldn't that much time/resources.)
+- eval: not done but important part. retrival eval (recall + place [mean rank]), answer eval (llm as a judge or os library)
+
+----
+- langchain swapable llm providers. chunking, embeddings, splitting, vectors, document loader (although not used). 
+- document loader (not using): raw pymupdf, not langchain loaders. need image, drawings, pixmap render, image deduplication, caption etc.
+- agent loop (rather than create agent): stategraph. full control over guardrails, iteration caps (guardrail + logging + error handling) more control over the agent. can add critic. and customize the loop.
+- agentic: tool calls. mcps as tools. in future can add them like list_documents, get video url etc.
+
+ui ux copilotchat:
+- copilotchat -> copilotruntime -> chat llm answer_question -> post to /chat langgraph -> gets answer/figure/citations -> render components + figure cards + citations. 
+- follow up issue: it'll paraphrase the answer from my agent. 
+- streaming UI by tool calls (not done): render components by tool_call (streamed). make ux cool! order the text, image, image, text linked along way. will solve the api gateway issue due to streaming. 
+- future: list machines/manuals or something like that. select and run on top of that. opensearch will help here.
+
+copilotkit:
+- useCopilotAction fires that /chat langgraph agent. use tools, compose answer, return. 
+CoAgents (not so serverless): streamx intermediate steps to UI. creative ideas with it. like using list_documents tools to list documents. but but requires persistent service. not serverless. currently can't see that live. 
+MCP: via tools in langchain. 
+
+-----
+lambda container: bge-base is in the container itself. replaceable when bedrock is available. (lambda function didn't work due to size constraints 250 limit, while 10gb for container is fine.)
+API gateway: 30 seconds cap. not streaming the response to copilot for now. directly using function url. 
+cloudformation and serverless: generated cloudformation from serverless.yml. 
+bedrock: payment method + quota issue. 
+dynamodb: not used for now becasue not storing the chat history.
+make it solid: production should be using auth, ratelimiting, captcha, enforce limits accordingly. secret manager. 
+
+------

@@ -1,0 +1,60 @@
+service: document-copilot
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-south-1
+  stage: ${opt:stage, 'dev'}
+  memorySize: 1024
+  timeout: 30
+  logRetentionInDays: 7
+  ecr:
+    images:
+      appimage:
+        path: ./
+        platform: linux/amd64
+  environment:
+    STAGE: ${self:provider.stage}
+    # LLM provider: bedrock | openrouter
+    LLM_PROVIDER: ${env:LLM_PROVIDER, 'openrouter'}
+    GROQ_API_KEY: ${env:GROQ_API_KEY, ''}
+    GROQ_MODEL: ${env:GROQ_MODEL, 'openai/gpt-oss-120b'}
+    OPENROUTER_API_KEY: ${env:OPENROUTER_API_KEY, ''}
+    OPENROUTER_MODEL: ${env:OPENROUTER_MODEL, 'anthropic/claude-sonnet-4.6'}
+    BEDROCK_REGION: ap-south-1
+    BEDROCK_MODEL_ID: global.anthropic.claude-sonnet-4-6
+    VECTORS_BUCKET: ${env:VECTORS_BUCKET, 'document-copilot-vectors-521170871988'}
+    IMAGES_BUCKET: ${env:IMAGES_BUCKET, 'document-copilot-images-521170871988'}
+    FASTEMBED_CACHE: /var/task/fastembed-cache
+    COPILOTKIT_TELEMETRY_DISABLED: true
+    GUARDRAIL_ID: ${env:GUARDRAIL_ID, '3gv9yigc91gz'}
+    GUARDRAIL_VERSION: ${env:GUARDRAIL_VERSION, 'DRAFT'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+            - bedrock:Converse
+            - bedrock:ConverseStream
+            - bedrock:ApplyGuardrail
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+          Resource:
+            - arn:aws:s3:::document-copilot-vectors-521170871988/*
+            - arn:aws:s3:::document-copilot-images-521170871988/*
+
+functions:
+  agent:
+    image:
+      name: appimage
+    description: Agent (LangGraph + RAG tools) — container Lambda, bge-base baked in (D021)
+    memorySize: 3008
+    timeout: 300
+    url: true

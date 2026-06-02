@@ -1,0 +1,30 @@
+{
+  "guardrailIdentifier": "3gv9yigc91gz",
+  "name": "document-copilot-guardrail",
+  "description": "Industrial-manual copilot guardrail: blocks off-domain advice (medical/legal/financial), harmful content, and prompt-injection.",
+  "blockedInputMessaging": "This copilot only handles industrial-document questions. Ask about a manual, alarm code, procedure, or diagram.",
+  "blockedOutputsMessaging": "This copilot only handles industrial-document questions. Ask about a manual, alarm code, procedure, or diagram.",
+  "contentPolicyConfig": {
+    "filtersConfig": [
+      { "type": "HATE", "inputStrength": "MEDIUM", "outputStrength": "MEDIUM" },
+      { "type": "SEXUAL", "inputStrength": "MEDIUM", "outputStrength": "MEDIUM" },
+      { "type": "PROMPT_ATTACK", "inputStrength": "HIGH", "outputStrength": "NONE" }
+    ]
+  },
+  "topicPolicyConfig": {
+    "topicsConfig": [
+      {
+        "name": "MedicalAdvice",
+        "type": "DENY",
+        "definition": "Diagnosing, treating, or giving advice about human medical or health conditions, medications, symptoms, or injuries to a person.",
+        "examples": ["What dosage of ibuprofen should I take?", "How do I treat a deep cut on my hand?"]
+      },
+      {
+        "name": "LegalOrFinancialAdvice",
+        "type": "DENY",
+        "definition": "Providing legal, investment, tax, or personal financial advice.",
+        "examples": ["Should I invest in this stock?", "How do I sue my employer?"]
+      }
+    ]
+  }
+}
